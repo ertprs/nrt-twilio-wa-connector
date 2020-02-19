@@ -1,3 +1,7 @@
+# Folders
 .idea
 node_modules
 build
+
+# Files
+.env

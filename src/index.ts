@@ -1,4 +1,9 @@
-import ExampleServer from './ExampleServer';
+import WhatsappTwilioConnector from './connectors/WhatsappTwilioConnector';
+import * as dotenv from "dotenv";
 
-const exampleServer = new ExampleServer();
-exampleServer.start(3001);
+dotenv.config();
+
+new WhatsappTwilioConnector(
+    Number(process.env.APP_INCOMING_PORT),
+    Number(process.env.APP_OUTGOING_PORT),
+);

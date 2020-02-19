@@ -11,7 +11,8 @@
     "moduleResolution": "node",
     "importHelpers": true,
     "types": [
-      "node"
+      "node",
+      "process"
     ],
     "typeRoots": [
       "node_modules/@types"
