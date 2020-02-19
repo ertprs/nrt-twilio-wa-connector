@@ -1,17 +1,29 @@
 import Connector from "./Connector";
 import {Logger} from "@overnightjs/logger";
+import * as Amqp from "amqp-ts";
 const twilio = require('twilio');
 
 export class WhatsappTwilioConnector extends Connector {
     private static readonly CONNECTOR_NAME: string = 'Whatsapp Twilio Connector';
-    private readonly incomingPort:number;
-    private readonly outgoingPort:number;
+    private readonly incomingPort: number;
+    private readonly outgoingPort: number;
+    private readonly exchangeName: string = 'connectors';
+    private readonly queueName: string = 'WATwilioConnector';
+    private queue: Amqp.Queue;
 
     constructor(incomingPort: number, outgoingPort: number) {
         super();
+        this.initRabbitMQConnection();
         this.incomingPort = incomingPort;
         this.outgoingPort = outgoingPort;
         this.listen();
+    }
+
+    private initRabbitMQConnection(): void {
+        const connection = new Amqp.Connection("amqp://localhost");
+        const exchange = connection.declareExchange(this.exchangeName);
+        this.queue = connection.declareQueue(this.queueName);
+        this.queue.bind(exchange);
     }
 
     private listen (): void {
@@ -47,8 +59,7 @@ export class WhatsappTwilioConnector extends Connector {
     }
 
     public messageIn(message: any): void {
-        // TODO Should send data into queue
-        console.log (message);
+        this.queue.send(new Amqp.Message(message));
     }
 
     public messageOut(message: any): void {
@@ -57,6 +68,12 @@ export class WhatsappTwilioConnector extends Connector {
         const accountId           = process.env.TWILIO_ACCOUNT_ID;
         const authToken           = process.env.TWILIO_AUTH_TOKEN;
         const client              = twilio(accountId, authToken);
+
+        // TODO Code above will be replaced to code below
+        // const client              = twilio(message.accountId, message.authToken);
+        // delete message.accountId;
+        // delete message.authToken;
+
 
         client.messages.create(message).then((response: any) => {
             console.log(response);
