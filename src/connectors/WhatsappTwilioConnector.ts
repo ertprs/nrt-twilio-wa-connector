@@ -23,7 +23,6 @@ export class WhatsappTwilioConnector extends Connector {
         });
 
 
-
         // TODO Don't know, do we need to listen port
         //  Or just to create queue client and listen on the event
         this.app.listen(this.outgoingPort, () => {
@@ -48,11 +47,13 @@ export class WhatsappTwilioConnector extends Connector {
     }
 
     public messageIn(message: any): void {
-        // Should send data into queue
+        // TODO Should send data into queue
         console.log (message);
     }
 
     public messageOut(message: any): void {
+        // TODO remove later these lines, because later
+        //  this data will be already in message object
         const accountId           = process.env.TWILIO_ACCOUNT_ID;
         const authToken           = process.env.TWILIO_AUTH_TOKEN;
         const client              = twilio(accountId, authToken);
