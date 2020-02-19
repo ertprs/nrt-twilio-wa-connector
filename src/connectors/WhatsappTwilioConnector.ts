@@ -1,5 +1,6 @@
 import Connector from "./Connector";
 import {Logger} from "@overnightjs/logger";
+import * as amqp from "amqp-ts";
 const twilio = require('twilio');
 
 export class WhatsappTwilioConnector extends Connector {
@@ -49,7 +50,11 @@ export class WhatsappTwilioConnector extends Connector {
 
     public messageIn(message: any): void {
         // Should send data into queue
-        console.log (message);
+        let connection = new amqp.Connection();
+        let queue = connection.declareQueue('whatsapp-connector', {durable: true});
+        queue.send(message);
+
+        console.log(' [x] Sent \'' + message + '\'');
     }
 
     public messageOut(message: any): void {
