@@ -1,17 +1,24 @@
 import Connector from "./Connector";
 import {Logger} from "@overnightjs/logger";
 import * as amqp from "amqp-ts";
+import {inject, injectable} from "inversify";
+import {RabbitMQ} from '../Queue/rabbitMQ';
+import {TYPES} from '../../types';
+import container from "../../inversify.config";
 const twilio = require('twilio');
 
+@injectable()
 export class WhatsappTwilioConnector extends Connector {
     private static readonly CONNECTOR_NAME: string = 'Whatsapp Twilio Connector';
     private readonly incomingPort:number;
     private readonly outgoingPort:number;
+    private rabbitMQ: RabbitMQ;
 
     constructor(incomingPort: number, outgoingPort: number) {
         super();
         this.incomingPort = incomingPort;
         this.outgoingPort = outgoingPort;
+        this.rabbitMQ = container.get<RabbitMQ>(TYPES.RabbitMQ);
         this.listen();
     }
 
@@ -49,10 +56,7 @@ export class WhatsappTwilioConnector extends Connector {
 
     public messageIn(message: any): void {
         // Should send data into queue
-        let connection = new amqp.Connection();
-        let queue = connection.declareQueue('whatsapp-connector', {durable: true});
-        queue.send(message);
-
+        this.rabbitMQ.send(message);
         console.log(' [x] Sent \'' + message + '\'');
     }
 
