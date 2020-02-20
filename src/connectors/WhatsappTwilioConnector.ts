@@ -30,27 +30,22 @@ export class WhatsappTwilioConnector extends Connector {
         });
 
 
-        // TODO Don't know, do we need to listen port
-        //  Or just to create queue client and listen on the event
-        this.app.listen(this.outgoingPort, () => {
-            Logger.Imp(WhatsappTwilioConnector.CONNECTOR_NAME + this.outgoingPort);
-            this.app.post('/twilio-outgoing-message', (request, response) => {
-                console.log(request.body);
+        this.rabbitMQ.receive((message: string) => {
+            console.log ('[x] Get object from outgoing queue');
+            // TODO This data will be get from queue
+            //  just now hardcoded
 
-                // TODO This data will be get from queue
-                //  just now hardcoded
-                const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
-                let testOutgoingMessage = {
-                    'from': twilioPhoneNumber,
-                    'to': 'whatsapp:' + '+380971303915',
-                    'body': 'test body message'
-                };
+            const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+            let testOutgoingMessage = {
+                'from': twilioPhoneNumber,
+                'to': 'whatsapp:' + '+380971303915',
+                'body': 'test body message'
+            };
 
-                this.messageOut(testOutgoingMessage);
+            this.messageOut(testOutgoingMessage);
 
-                // this.messageOut(request.body);
-            });
-        })
+            // this.messageOut(message);
+        });
     }
 
     public messageIn(message: any): void {
