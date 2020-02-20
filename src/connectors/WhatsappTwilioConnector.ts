@@ -1,7 +1,6 @@
 import Connector from "./Connector";
 import {Logger} from "@overnightjs/logger";
-import * as amqp from "amqp-ts";
-import {inject, injectable} from "inversify";
+import {injectable} from "inversify";
 import {RabbitMQ} from '../Queue/rabbitMQ';
 import {TYPES} from '../../types';
 import container from "../../inversify.config";
