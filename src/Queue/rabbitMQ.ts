@@ -2,6 +2,8 @@ import {injectable} from "inversify";
 import * as amqp from 'amqp-ts';
 import {RabbitMQConstants} from './rabbitMQConstants';
 
+type callbackFunctionType = (message: string) => boolean;
+
 @injectable()
 export class RabbitMQ {
     private incomingQueue: amqp.Queue;
@@ -11,7 +13,6 @@ export class RabbitMQ {
         const connection = new amqp.Connection(RabbitMQConstants.QUEUE_HOST);
         this.incomingQueue = connection.declareQueue(RabbitMQConstants.QUEUE_NAME_INCOMING, {durable: true});
         this.outgoingQueue = connection.declareQueue(RabbitMQConstants.QUEUE_NAME_OUTGOING, {durable: true});
-
 
         // TODO Should be removed
         //  Added just for test RabbitMQ
@@ -23,10 +24,13 @@ export class RabbitMQ {
         return true;
     }
 
-    public receive(callbackFunction: any) {
+    public receive(callbackFunction: callbackFunctionType) {
         // TODO Later can replace to Promises
         this.outgoingQueue.activateConsumer((message) => {
-            callbackFunction(message.getContent());
-        })
+            if (callbackFunction(message.getContent())) {
+                console.log ('message was acknowledged');
+                message.ack();
+            }
+        });
     }
 }

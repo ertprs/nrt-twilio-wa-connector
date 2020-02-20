@@ -30,7 +30,7 @@ export class WhatsappTwilioConnector extends Connector {
         });
 
 
-        this.rabbitMQ.receive((message: string) => {
+        this.rabbitMQ.receive((message: string): boolean => {
             console.log ('[x] Get object from outgoing queue');
             // TODO This data will be get from queue
             //  just now hardcoded
@@ -42,7 +42,7 @@ export class WhatsappTwilioConnector extends Connector {
                 'body': 'test body message'
             };
 
-            this.messageOut(testOutgoingMessage);
+            return this.messageOut(testOutgoingMessage);
 
             // this.messageOut(message);
         });
@@ -54,18 +54,19 @@ export class WhatsappTwilioConnector extends Connector {
         console.log(' [x] Sent \'' + message + '\'');
     }
 
-    public messageOut(message: any): void {
+    public messageOut(message: any): boolean {
         // TODO remove later these lines, because later
         //  this data will be already in message object
         const accountId           = process.env.TWILIO_ACCOUNT_ID;
         const authToken           = process.env.TWILIO_AUTH_TOKEN;
         const client              = twilio(accountId, authToken);
 
-        client.messages.create(message).then((response: any) => {
-            console.log(response);
+        return client.messages.create(message).then((response: any) => {
+            return true;
         }).catch((error: any) =>  {
             console.log(error);
-        })
+            return false;
+        });
     }
 
 }

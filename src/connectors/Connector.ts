@@ -3,7 +3,7 @@ import { Server } from '@overnightjs/core';
 
 export default class Connector extends Server {
     constructor() {
-        super()
+        super();
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({extended: true}));
     }
