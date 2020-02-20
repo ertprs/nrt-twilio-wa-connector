@@ -12,7 +12,7 @@ export class RabbitMQ {
     }
 
     public send(message: any) {
-        this.queue.send(message);
+        this.queue.send(new amqp.Message(message));
         return true;
     }
 }
